@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image, SafeAreaView, ScrollView } from 'react-native';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import { AuthContext } from '../contexts/AuthContext';

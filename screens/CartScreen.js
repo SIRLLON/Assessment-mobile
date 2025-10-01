@@ -1,41 +1,17 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, SafeAreaView, Image } from 'react-native';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { AuthContext } from '../contexts/AuthContext';
 import { lightTheme, darkTheme } from '../utils/theme';
 
-export default function CartScreen({ route, navigation }) {
-  const { cartItems: initialCartItems } = route.params;
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const { theme } = useContext(AuthContext);
+export default function CartScreen({ navigation }) {
+  const { theme, cart, updateQuantity, removeFromCart } = useContext(AuthContext);
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
 
-  useEffect(() => {
-    if (route.params?.cartItems) {
-      setCartItems(route.params.cartItems);
-    }
-  }, [route.params?.cartItems]);
-
   const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  };
-
-  const handleIncreaseQuantity = (itemId) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
-
-  const handleDecreaseQuantity = (itemId) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === itemId ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
-      ).filter(item => item.quantity > 0)
-    );
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
   const handleRemoveItem = (itemId) => {
@@ -44,7 +20,7 @@ export default function CartScreen({ route, navigation }) {
       "Tem certeza que deseja remover este item do carrinho?",
       [
         { text: "Cancelar", style: "cancel" },
-        { text: "Remover", onPress: () => setCartItems(prevItems => prevItems.filter(item => item.id !== itemId)) }
+        { text: "Remover", onPress: () => removeFromCart(itemId) }
       ]
     );
   };
@@ -131,17 +107,17 @@ export default function CartScreen({ route, navigation }) {
 
   const renderCartItem = ({ item }) => (
     <Card style={styles.cartItemCard}>
-      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      <Image source={item.image} style={styles.itemImage} />
       <View style={styles.itemInfo}>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.itemPrice}>R$ {item.price.toFixed(2)}</Text>
       </View>
       <View style={styles.quantityControl}>
-        <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecreaseQuantity(item.id)}>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => updateQuantity(item.id, -1)}>
           <Text style={styles.quantityButtonText}>-</Text>
         </TouchableOpacity>
         <Text style={styles.quantityText}>{item.quantity}</Text>
-        <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncreaseQuantity(item.id)}>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => updateQuantity(item.id, 1)}>
           <Text style={styles.quantityButtonText}>+</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveItem(item.id)}>
@@ -155,7 +131,7 @@ export default function CartScreen({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <Header title="Meu Carrinho" />
       <FlatList
-        data={cartItems}
+        data={cart}
         renderItem={renderCartItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.cartList}
@@ -163,7 +139,7 @@ export default function CartScreen({ route, navigation }) {
       />
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total: R$ {calculateTotal().toFixed(2)}</Text>
-        {cartItems.length > 0 && (
+        {cart.length > 0 && (
           <Button title="Finalizar Pedido" onPress={() => navigation.navigate('Checkout')} />
         )}
       </View>

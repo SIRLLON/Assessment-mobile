@@ -4,11 +4,10 @@ import Header from '../components/Header';
 import Button from '../components/Button';
 import { AuthContext } from '../contexts/AuthContext';
 import { lightTheme, darkTheme } from '../utils/theme';
-import { DADOS_USUARIO } from '../utils/mockData';
 import { schedulePushNotification } from '../utils/notifications';
 
 export default function CheckoutScreen({ navigation }) {
-  const { user, theme } = useContext(AuthContext);
+  const { user, theme, clearCart } = useContext(AuthContext);
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
 
   const [address, setAddress] = useState(user?.address || '');
@@ -30,7 +29,9 @@ export default function CheckoutScreen({ navigation }) {
         'Seu pedido foi realizado com sucesso e será entregue em breve!',
         [{ text: 'OK', onPress: () => {
           schedulePushNotification("InfnetFood", "Seu pedido foi confirmado!");
-          navigation.popToTop(); // Volta para a Home
+          clearCart();
+          // CORREÇÃO APLICADA AQUI
+          navigation.popToTop(); 
         } }]
       );
     } else {
@@ -112,3 +113,4 @@ export default function CheckoutScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+

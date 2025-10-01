@@ -57,7 +57,7 @@ export default function MapScreen({ navigation }) {
       <Header title="Restaurantes Próximos" />
       <ScrollView>
         <Image
-          source={{ uri: 'https://placehold.co/800x400/336699/white?text=Mapa+Centro+RJ' }}
+          source={require('../assets/images/mapa_centro_rj_amplo.png')} 
           style={styles.mapImage}
         />
         <View style={styles.restaurantsContainer}>

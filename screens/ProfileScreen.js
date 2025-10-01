@@ -1,54 +1,59 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
 import Header from '../components/Header';
+import Button from '../components/Button';
 import { AuthContext } from '../contexts/AuthContext';
 import { lightTheme, darkTheme } from '../utils/theme';
-import Button from '../components/Button';
+import { DADOS_USUARIO } from '../utils/mockData';
 
-const getStyles = (currentTheme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: currentTheme.background,
-  },
-  content: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
-    borderColor: currentTheme.primary,
-    borderWidth: 2,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: currentTheme.text,
-    marginTop: 15,
-  },
-  value: {
-    fontSize: 16,
-    color: currentTheme.textSecondary,
-    marginBottom: 5,
-  },
-  logoutButtonContainer: {
-    marginTop: 30,
-    width: '80%',
-  },
-});
-
-export default function ProfileScreen({ navigation }) {
-  const { user, signOut, theme } = useContext(AuthContext);
+export default function ProfileScreen() {
+  const { signOut, theme } = useContext(AuthContext);
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
-  const styles = getStyles(currentTheme);
+
+  const user = DADOS_USUARIO; 
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: currentTheme.background,
+    },
+    content: {
+      flex: 1,
+      alignItems: 'center',
+      padding: 20,
+    },
+    profileImage: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      marginBottom: 30,
+      borderColor: currentTheme.primary,
+      borderWidth: 2,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: currentTheme.text,
+      marginTop: 10,
+    },
+    value: {
+      fontSize: 16,
+      color: currentTheme.textSecondary,
+      marginBottom: 5,
+    },
+    logoutButtonContainer: {
+      marginTop: 'auto',
+      width: '100%',
+      paddingHorizontal: 20,
+    }
+  });
 
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Meu Perfil" />
       <View style={styles.content}>
-        <Image source={{ uri: 'https://placehold.co/120x120/FF5733/white?text=User' }} style={styles.profileImage} />
+        <Image source={user?.image} style={styles.profileImage} /> 
+        
         <Text style={styles.label}>Nome:</Text>
         <Text style={styles.value}>{user?.name}</Text>
         <Text style={styles.label}>E-mail:</Text>
@@ -64,4 +69,3 @@ export default function ProfileScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-

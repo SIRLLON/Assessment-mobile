@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, FlatList, StyleSheet, Image, SafeAreaView } from 'react-native';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -9,24 +9,10 @@ import { lightTheme, darkTheme } from '../utils/theme';
 
 export default function ProductsScreen({ route, navigation }) {
   const { categoryId, categoryName } = route.params;
-  const { theme } = useContext(AuthContext);
+  const { theme, cart, addToCart } = useContext(AuthContext);
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
 
-  const [cartItems, setCartItems] = useState([]);
-
   const filteredProducts = PRODUTOS.filter(product => product.categoryId === categoryId);
-
-  const handleAddToCart = (product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
-  };
 
   const styles = StyleSheet.create({
     container: {
@@ -68,17 +54,6 @@ export default function ProductsScreen({ route, navigation }) {
       fontWeight: 'bold',
       color: currentTheme.primary,
     },
-    cartButton: {
-      marginLeft: 10,
-      paddingVertical: 8,
-      paddingHorizontal: 15,
-      borderRadius: 8,
-      backgroundColor: currentTheme.success,
-    },
-    cartButtonText: {
-      color: '#fff',
-      fontWeight: 'bold',
-    },
     cartSummaryContainer: {
       padding: 15,
       borderTopWidth: 1,
@@ -96,17 +71,17 @@ export default function ProductsScreen({ route, navigation }) {
 
   const renderProduct = ({ item }) => (
     <Card style={styles.productCard}>
-      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <Image source={item.image} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productDescription} numberOfLines={2}>{item.description}</Text>
         <Text style={styles.productPrice}>R$ {item.price.toFixed(2)}</Text>
       </View>
-      <Button title="Adicionar" onPress={() => handleAddToCart(item)} />
+      <Button title="Adicionar" onPress={() => addToCart(item)} />
     </Card>
   );
 
-  const totalItemsInCart = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItemsInCart = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -120,7 +95,7 @@ export default function ProductsScreen({ route, navigation }) {
       {totalItemsInCart > 0 && (
         <View style={styles.cartSummaryContainer}>
           <Text style={styles.cartSummaryText}>Itens no carrinho: {totalItemsInCart}</Text>
-          <Button title="Ver Carrinho" onPress={() => navigation.navigate('Cart', { cartItems })} />
+          <Button title="Ver Carrinho" onPress={() => navigation.navigate('Cart')} />
         </View>
       )}
     </SafeAreaView>
